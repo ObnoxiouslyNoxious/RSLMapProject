@@ -211,7 +211,7 @@ function getVis(){
 function draw(){
   bgX.clearRect(0,0,W,H);dx.clearRect(0,0,W,H);bgX.fillStyle="#1a1f1a";bgX.fillRect(0,0,W,H);
   if(imgOk)bgX.drawImage(imgEl,vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);
-  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Click 'Load Map' to see 'Random Spawn Locations' - Map is a 32MB file. Be patient if on a Mobile Device and/or using WiFi",vx+20,vy+30);}
+  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Click 'Load Map' to see the Random Spawn Locations Map.",vx+20,vy+30);bgX.fillText("Map is a 32MB file.",vx+20,vy+50);bgX.fillText("Be patient if on a Mobile Device and/or using WiFi.",vx+20,vy+70);}
   var vis=getVis();
   document.getElementById("iVis").textContent=vis.length;
   document.getElementById("iBal").textContent=pts.filter(function(p){return p.bal;}).length;
@@ -427,7 +427,7 @@ function setupFilters(){
   });
 }
 
-function loadImg(){var path="worldmap.png";imgEl=new Image();imgEl.onload=function(){imgOk=true;resetView();};imgEl.onerror=function(){imgOk=false;draw();alert("Could not load worldmap.png - place it in the same folder.");};imgEl.src=path;}
+function loadImg(){var path="worldmap.png";imgEl=new Image();imgEl.onload=function(){imgOk=true;resetView();};imgEl.onerror=function(){imgOk=false;draw();alert("World Map failed to Load. Please try again later.");};imgEl.src=path;}
 
 function togglePanel(k){
   ["town","type","cat","mapmod"].forEach(function(o){
