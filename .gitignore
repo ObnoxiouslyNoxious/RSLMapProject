@@ -1,0 +1,13 @@
+# Ignore a specific file
+RSL_MapperTool_DevLog.md
+RSL_MapperTool_TodoList.md
+
+# Ignore an entire folder (always add a trailing slash)
+node_modules/
+/logs/
+
+# Ignore all files with a specific extension
+*.log
+*.env
+
+# Ignore a specific file inside a specific folder
