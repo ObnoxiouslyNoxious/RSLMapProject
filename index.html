@@ -46,6 +46,19 @@ canvas{position:absolute;top:0;left:0}
 #zbtn{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;gap:3px;z-index:10}
 #zbtn button{width:26px;height:26px;font-size:14px;padding:0;text-align:center}
 #copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:12px;display:none;z-index:200;pointer-events:none}
+
+/* Multi-select filter dropdowns */
+.flt-wrap{position:relative;display:inline-block}
+.flt-btn{background:#222;border:1px solid #444;color:#ddd;padding:3px 20px 3px 6px;font-size:11px;font-family:monospace;cursor:pointer;border-radius:2px;white-space:nowrap}
+.flt-btn:hover{border-color:#777}
+.flt-btn.active{border-color:#4a8aaa;color:#7adafa}
+.flt-panel{display:none;position:absolute;top:100%;left:0;z-index:500;background:#1a1a1a;border:1px solid #444;border-radius:2px;min-width:160px;max-height:260px;overflow-y:auto;margin-top:2px;box-shadow:0 4px 12px rgba(0,0,0,0.6)}
+.flt-panel.open{display:block}
+.flt-action{padding:4px 8px;font-size:10px;color:#7aaafa;cursor:pointer;border-bottom:1px solid #222;display:block;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:monospace}
+.flt-action:hover{background:#1a2a3a}
+.flt-item{display:flex;align-items:center;padding:3px 8px;cursor:pointer;font-size:11px;font-family:monospace;color:#ccc;gap:6px}
+.flt-item:hover{background:#222}
+.flt-item input[type=checkbox]{accent-color:#4a8aaa;cursor:pointer;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -56,13 +69,37 @@ canvas{position:absolute;top:0;left:0}
   </div>
   <div class="tb-group">
     <span class="tb-label">Town:</span>
-    <select id="fTown"><option value="">Show All</option><option value="__hide__">Hide All</option></select>
+    <div class="flt-wrap" id="wrap-town">
+      <button class="flt-btn" id="btn-town" onclick="togglePanel('town')">Show All ▾</button>
+      <div class="flt-panel" id="panel-town">
+        <button class="flt-action" onclick="filterAction('town','all')">Show All</button>
+        <button class="flt-action" onclick="filterAction('town','none')">Hide All</button>
+      </div>
+    </div>
     <span class="tb-label">Type:</span>
-    <select id="fType"><option value="">Show All</option><option value="__hide__">Hide All</option></select>
+    <div class="flt-wrap" id="wrap-type">
+      <button class="flt-btn" id="btn-type" onclick="togglePanel('type')">Show All ▾</button>
+      <div class="flt-panel" id="panel-type">
+        <button class="flt-action" onclick="filterAction('type','all')">Show All</button>
+        <button class="flt-action" onclick="filterAction('type','none')">Hide All</button>
+      </div>
+    </div>
     <span class="tb-label">Cat:</span>
-    <select id="fCat"><option value="">Show All</option><option value="__hide__">Hide All</option></select>
+    <div class="flt-wrap" id="wrap-cat">
+      <button class="flt-btn" id="btn-cat" onclick="togglePanel('cat')">Show All ▾</button>
+      <div class="flt-panel" id="panel-cat">
+        <button class="flt-action" onclick="filterAction('cat','all')">Show All</button>
+        <button class="flt-action" onclick="filterAction('cat','none')">Hide All</button>
+      </div>
+    </div>
     <span class="tb-label">Map Mods:</span>
-    <select id="fMapMod"><option value="">Show All</option><option value="__hide__">Hide All</option></select>
+    <div class="flt-wrap" id="wrap-mapmod">
+      <button class="flt-btn" id="btn-mapmod" onclick="togglePanel('mapmod')">Show All ▾</button>
+      <div class="flt-panel" id="panel-mapmod">
+        <button class="flt-action" onclick="filterAction('mapmod','all')">Show All</button>
+        <button class="flt-action" onclick="filterAction('mapmod','none')">Hide All</button>
+      </div>
+    </div>
   </div>
   <div class="tb-group">
     <button id="bBal" onclick="toggleMode('balance')">Balanced</button>
@@ -135,7 +172,7 @@ pts.forEach(function(p){var s=stateMap[p.id];if(s){p.bal=!!s.bal;p.hc=!!s.hc;p.w
 // Convert world coords to pixel coords using calibration values
 function w2p(ax,ay){return[ax*CAL_SX+CAL_OX, ay*CAL_SY+CAL_OY];}
 
-var vx=0,vy=0,vz=1,W=0,H=0,drag=false,dsx,dsy,dvx,dvy,selId=null,mode=null,fTown="",fType="",fCat="",fMapMod="",tab="towns",imgEl=null,imgOk=false,_selPt=null;
+var vx=0,vy=0,vz=1,W=0,H=0,drag=false,dsx,dsy,dvx,dvy,selId=null,mode=null,fTown=null,fType=null,fCat=null,fMapMod=null,tab="towns",imgEl=null,imgOk=false,_selPt=null;
 var wrap=document.getElementById("mapwrap"),bgC=document.getElementById("bgC"),bgX=bgC.getContext("2d"),dotC=document.getElementById("dotC"),dx=dotC.getContext("2d");
 function resize(){W=wrap.clientWidth;H=wrap.clientHeight;bgC.width=dotC.width=W;bgC.height=dotC.height=H;draw();}
 function i2s(ix,iy){return[ix*vz+vx,iy*vz+vy];}
@@ -147,22 +184,30 @@ function getVis(){
   return pts.filter(function(p){
     // Isolated Areas button mode
     if(mode==="isolated") return p.ti===ISO_INDEX;
-    // Hide isolated areas unless specifically filtered to them
-    if(p.ti===ISO_INDEX && fTown!=="Isolated Areas" && fTown!=="__hide__") { if(fTown==="") return false; }
-    // Map Mod filter
+    // Always hide isolated areas from normal view
+    if(p.ti===ISO_INDEX) return false;
+    // Map Mod filter - fully independent of town filter
     var isMapMod=MAP_MOD_INDICES.indexOf(p.ti)!==-1;
-    if(fMapMod==="__hide__" && isMapMod) return false;
-    if(fMapMod && fMapMod!=="__hide__" && fMapMod!=="__show__") { if(TOWNS[p.ti]!==fMapMod) return false; }
-    // If a map mod is selected via fMapMod, skip town filter for those
-    if(fTown==="__hide__") return false;
-    if(fTown && !isMapMod) { if(TOWNS[p.ti]!==fTown) return false; }
-    if(fType==="__hide__") return false;
-    if(fType && TYPES[p.xi]!==fType) return false;
-    if(fCat==="__hide__") return false;
-    if(fCat && CATS[p.ci]!==fCat) return false;
+    if(isMapMod){
+      if(fMapMod!==null && fMapMod.size===0) return false;          // Hide All
+      if(fMapMod!==null && !fMapMod.has(TOWNS[p.ti])) return false; // specific selection
+      if(fType!==null && fType.size===0) return false;
+      if(fType!==null && !fType.has(TYPES[p.xi])) return false;
+      if(fCat!==null && fCat.size===0) return false;
+      if(fCat!==null && !fCat.has(CATS[p.ci])) return false;
+      return true;
+    }
+    // Regular town filter
+    if(fTown!==null && fTown.size===0) return false;
+    if(fTown!==null && !fTown.has(TOWNS[p.ti])) return false;
+    if(fType!==null && fType.size===0) return false;
+    if(fType!==null && !fType.has(TYPES[p.xi])) return false;
+    if(fCat!==null && fCat.size===0) return false;
+    if(fCat!==null && !fCat.has(CATS[p.ci])) return false;
     return true;
   });
 }
+
 function draw(){
   bgX.clearRect(0,0,W,H);dx.clearRect(0,0,W,H);bgX.fillStyle="#1a1f1a";bgX.fillRect(0,0,W,H);
   if(imgOk)bgX.drawImage(imgEl,vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);
@@ -218,8 +263,52 @@ dotC.addEventListener("contextmenu",function(e){e.preventDefault();});
 dotC.addEventListener("wheel",function(e){e.preventDefault();zoom(e.deltaY<0?1.15:0.87,e.offsetX,e.offsetY);},{passive:false});
 function setTab(t){tab=t;["towns","stats"].forEach(function(n){document.getElementById("p-"+n).style.display=(n===t)?"":"none";document.getElementById("tab-"+n).classList.toggle("on",n===t);});if(t==="stats")renderStats();}
 function toggleMode(m){mode=(mode===m)?null:m;["Bal","Hc","Iso","Wild"].forEach(function(s){document.getElementById("b"+s).classList.remove("on");});if(mode==="balance")document.getElementById("bBal").classList.add("on");if(mode==="hardcore")document.getElementById("bHc").classList.add("on");if(mode==="isolated")document.getElementById("bIso").classList.add("on");if(mode==="wilderness")document.getElementById("bWild").classList.add("on");draw();}
-function renderTowns(){var MAP_MOD_INDICES=[16,17,18],ISO_INDEX=8;var c={},b={};pts.forEach(function(p){var t=TOWNS[p.ti];c[t]=(c[t]||0)+1;if(p.bal)b[t]=(b[t]||0)+1;});var html="<div class=\"ptitle\">Towns (Balanced/Total)</div>";TOWNS.forEach(function(t,i){if(MAP_MOD_INDICES.indexOf(i)!==-1||i===ISO_INDEX)return;html+="<div class=\"town-row"+(fTown===t?" sel":"")+"\" data-town=\""+t+"\"><span class=\"dot\" style=\"background:"+TC[i]+"\"></span><span class=\"tname\">"+t+"</span><span class=\"tcnt\">"+(b[t]||0)+"/"+(c[t]||0)+"</span></div>";});document.getElementById("p-towns").innerHTML=html;document.querySelectorAll(".town-row").forEach(function(el){el.addEventListener("click",function(){setTF(this.dataset.town);});});}
-function setTF(t){fTown=(fTown===t)?"":t;document.getElementById("fTown").value=fTown;draw();}
+function renderTowns(){
+  var MAP_MOD_INDICES=[16,17,18],ISO_INDEX=8;
+  var vis=getVis();
+  // Count balanced and total per town from visible points only
+  var c={},b={};
+  vis.forEach(function(p){var t=TOWNS[p.ti];c[t]=(c[t]||0)+1;if(p.bal)b[t]=(b[t]||0)+1;});
+  // Towns section - exclude map mods and isolated areas
+  var html="<div class=\"ptitle\">Towns (Balanced/Total)</div>";
+  var anyTown=false;
+  TOWNS.forEach(function(t,i){
+    if(MAP_MOD_INDICES.indexOf(i)!==-1||i===ISO_INDEX)return;
+    if(!c[t])return; // hide if no visible points
+    anyTown=true;
+    html+="<div class=\"town-row"+(fTown===t?" sel":"")+"\" data-town=\""+t+"\"><span class=\"dot\" style=\"background:"+TC[i]+"\"></span><span class=\"tname\">"+t+"</span><span class=\"tcnt\">"+(b[t]||0)+"/"+(c[t]||0)+"</span></div>";
+  });
+  if(!anyTown)html+="<div style=\"color:#555;font-size:11px;padding:6px\">No towns visible</div>";
+  // Map Mods section - only show if any map mod points are visible
+  var anyMod=false;
+  var modHtml="<div class=\"ptitle\" style=\"margin-top:8px\">Map Mods (Balanced/Total)</div>";
+  MAP_MOD_INDICES.forEach(function(i){
+    var t=TOWNS[i];
+    if(!c[t])return;
+    anyMod=true;
+    modHtml+="<div class=\"town-row"+(fMapMod===t?" sel":"")+"\" data-mod=\""+t+"\"><span class=\"dot\" style=\"background:"+TC[i]+"\"></span><span class=\"tname\">"+t+"</span><span class=\"tcnt\">"+(b[t]||0)+"/"+(c[t]||0)+"</span></div>";
+  });
+  if(anyMod)html+=modHtml;
+  document.getElementById("p-towns").innerHTML=html;
+  // Town row click handlers
+  document.querySelectorAll(".town-row[data-town]").forEach(function(el){
+    el.addEventListener("click",function(){setTF(this.dataset.town);});
+  });
+  // Map Mod row click handlers
+  document.querySelectorAll(".town-row[data-mod]").forEach(function(el){
+    el.addEventListener("click",function(){setMF(this.dataset.mod);});
+  });
+}
+function setTF(t){
+  if(fTown===null){fTown=new Set(TOWNS.filter(function(_,i){return [16,17,18].indexOf(i)===-1&&i!==8;}));}
+  if(fTown.has(t)){fTown.delete(t);}else{fTown.add(t);}
+  syncCheckboxes("town",fTown);updateFilterBtn("town");draw();
+}
+function setMF(t){
+  if(fMapMod===null){fMapMod=new Set(TOWNS.filter(function(_,i){return [16,17,18].indexOf(i)!==-1;}));}
+  if(fMapMod.has(t)){fMapMod.delete(t);}else{fMapMod.add(t);}
+  syncCheckboxes("mapmod",fMapMod);updateFilterBtn("mapmod");draw();
+}
 function mkOpt(val,label,sel){return "<option value=\""+val+"\""+(sel?" selected":"")+">"+label+"</option>";}
 function renderStats(){var byTown={};pts.forEach(function(p){var t=TOWNS[p.ti];if(!byTown[t])byTown[t]={tot:0,bal:0,hc:0,res:0};byTown[t].tot++;if(p.bal)byTown[t].bal++;if(p.hc)byTown[t].hc++;if(p.xi===0)byTown[t].res++;});var h="<div class=\"ptitle\">Stats</div><div style=\"font-size:10px\"><div style=\"display:grid;grid-template-columns:1fr auto auto auto auto;gap:2px 6px;color:#444;padding:2px 0;border-bottom:1px solid #222\"><span>town</span><span>tot</span><span>bal</span><span>hc</span><span>res</span></div>";Object.keys(byTown).sort(function(a,b){return byTown[b].tot-byTown[a].tot;}).forEach(function(t){var s=byTown[t];h+="<div style=\"display:grid;grid-template-columns:1fr auto auto auto auto;gap:2px 6px;padding:2px 0;border-bottom:1px solid #1a1a1a\"><span style=\"color:#aaa\">"+t+"</span><span style=\"color:#777\">"+s.tot+"</span><span style=\"color:#6afa6a\">"+s.bal+"</span><span style=\"color:#fa6afa\">"+s.hc+"</span><span style=\"color:#6aaafa\">"+s.res+"</span></div>";});document.getElementById("p-stats").innerHTML=h+"</div>";}
 function saveState(){var s=pts.map(function(p){return{id:p.id,bal:p.bal,hc:p.hc,wild:p.wild,mt:p.mt,ti:p.ti,xi:p.xi,ci:p.ci,note:p.note};});dl("rsl_state.json",JSON.stringify(s));}
@@ -293,24 +382,119 @@ function dl(name,txt){var a=document.createElement("a");a.href="data:text/plain;
 function setupFilters(){
   var MAP_MOD_INDICES=[16,17,18];
   var ISO_INDEX=8;
-  var ft=document.getElementById("fTown");
+  var townPanel=document.getElementById("panel-town");
   TOWNS.forEach(function(t,i){
-    if(MAP_MOD_INDICES.indexOf(i)!==-1) return; // skip map mods
-    if(i===ISO_INDEX) return; // skip isolated areas (handled by button)
-    var o=document.createElement("option");o.value=t;o.textContent=t;ft.appendChild(o);
+    if(MAP_MOD_INDICES.indexOf(i)!==-1||i===ISO_INDEX) return;
+    var lbl=document.createElement("label");lbl.className="flt-item";
+    var cb=document.createElement("input");cb.type="checkbox";cb.checked=true;cb.value=t;
+    cb.onchange=function(){toggleFilterItem("town",t,this.checked);};
+    lbl.appendChild(cb);lbl.appendChild(document.createTextNode(t));
+    townPanel.appendChild(lbl);
   });
-  ft.onchange=function(){fTown=ft.value;draw();};
-  var fty=document.getElementById("fType");
-  TYPES.forEach(function(t){var o=document.createElement("option");o.value=t;o.textContent=t;fty.appendChild(o);});
-  fty.onchange=function(){fType=fty.value;draw();};
-  var fc=document.getElementById("fCat");
-  CATS.forEach(function(t){var o=document.createElement("option");o.value=t;o.textContent=t;fc.appendChild(o);});
-  fc.onchange=function(){fCat=fc.value;draw();};
-  var fm=document.getElementById("fMapMod");
-  MAP_MOD_INDICES.forEach(function(i){var o=document.createElement("option");o.value=TOWNS[i];o.textContent=TOWNS[i];fm.appendChild(o);});
-  fm.onchange=function(){fMapMod=fm.value;draw();};
+  var typePanel=document.getElementById("panel-type");
+  TYPES.forEach(function(t){
+    var lbl=document.createElement("label");lbl.className="flt-item";
+    var cb=document.createElement("input");cb.type="checkbox";cb.checked=true;cb.value=t;
+    cb.onchange=function(){toggleFilterItem("type",t,this.checked);};
+    lbl.appendChild(cb);lbl.appendChild(document.createTextNode(t));
+    typePanel.appendChild(lbl);
+  });
+  var catPanel=document.getElementById("panel-cat");
+  CATS.forEach(function(t){
+    var lbl=document.createElement("label");lbl.className="flt-item";
+    var cb=document.createElement("input");cb.type="checkbox";cb.checked=true;cb.value=t;
+    cb.onchange=function(){toggleFilterItem("cat",t,this.checked);};
+    lbl.appendChild(cb);lbl.appendChild(document.createTextNode(t));
+    catPanel.appendChild(lbl);
+  });
+  var modPanel=document.getElementById("panel-mapmod");
+  MAP_MOD_INDICES.forEach(function(i){
+    var t=TOWNS[i];
+    var lbl=document.createElement("label");lbl.className="flt-item";
+    var cb=document.createElement("input");cb.type="checkbox";cb.checked=true;cb.value=t;
+    cb.onchange=function(){toggleFilterItem("mapmod",t,this.checked);};
+    lbl.appendChild(cb);lbl.appendChild(document.createTextNode(t));
+    modPanel.appendChild(lbl);
+  });
+  // Close panels when clicking outside
+  document.addEventListener("click",function(e){
+    ["town","type","cat","mapmod"].forEach(function(k){
+      var wrap=document.getElementById("wrap-"+k);
+      if(wrap&&!wrap.contains(e.target)){
+        document.getElementById("panel-"+k).classList.remove("open");
+      }
+    });
+  });
 }
+
 function loadImg(){var path="worldmap.png";imgEl=new Image();imgEl.onload=function(){imgOk=true;resetView();};imgEl.onerror=function(){imgOk=false;draw();alert("Could not load worldmap.png - place it in the same folder.");};imgEl.src=path;}
+
+function togglePanel(k){
+  ["town","type","cat","mapmod"].forEach(function(o){
+    if(o!==k) document.getElementById("panel-"+o).classList.remove("open");
+  });
+  document.getElementById("panel-"+k).classList.toggle("open");
+}
+function filterAction(k,action){
+  var MAP_MOD_INDICES=[16,17,18],ISO_INDEX=8;
+  var panel=document.getElementById("panel-"+k);
+  var cbs=panel.querySelectorAll("input[type=checkbox]");
+  if(action==="all"){
+    cbs.forEach(function(cb){cb.checked=true;});
+    if(k==="town") fTown=null;
+    else if(k==="type") fType=null;
+    else if(k==="cat") fCat=null;
+    else if(k==="mapmod") fMapMod=null;
+  } else {
+    cbs.forEach(function(cb){cb.checked=false;});
+    if(k==="town") fTown=new Set();
+    else if(k==="type") fType=new Set();
+    else if(k==="cat") fCat=new Set();
+    else if(k==="mapmod") fMapMod=new Set();
+  }
+  updateFilterBtn(k);draw();
+}
+function toggleFilterItem(k,val,checked){
+  var getAll=function(k2){
+    var MAP_MOD_INDICES=[16,17,18],ISO_INDEX=8;
+    if(k2==="town") return TOWNS.filter(function(_,i){return MAP_MOD_INDICES.indexOf(i)===-1&&i!==ISO_INDEX;});
+    if(k2==="type") return TYPES;
+    if(k2==="cat") return CATS;
+    if(k2==="mapmod") return TOWNS.filter(function(_,i){return [16,17,18].indexOf(i)!==-1;});
+    return [];
+  };
+  var all=getAll(k);
+  var cur=(k==="town"?fTown:k==="type"?fType:k==="cat"?fCat:fMapMod);
+  if(cur===null) cur=new Set(all);
+  if(checked){cur.add(val);}else{cur.delete(val);}
+  // If all checked, reset to null (Show All)
+  if(cur.size===all.length) cur=null;
+  if(k==="town") fTown=cur;
+  else if(k==="type") fType=cur;
+  else if(k==="cat") fCat=cur;
+  else fMapMod=cur;
+  updateFilterBtn(k);draw();
+}
+function syncCheckboxes(k,s){
+  var panel=document.getElementById("panel-"+k);
+  panel.querySelectorAll("input[type=checkbox]").forEach(function(cb){
+    cb.checked=(s===null||s.has(cb.value));
+  });
+}
+function updateFilterBtn(k){
+  var btn=document.getElementById("btn-"+k);
+  var f=(k==="town"?fTown:k==="type"?fType:k==="cat"?fCat:fMapMod);
+  if(f===null){btn.textContent=k.charAt(0).toUpperCase()+k.slice(1).replace("mapmod","Map Mod")+" ▾";btn.classList.remove("active");return;}
+  if(k==="btn-town") k="town";
+  var label;
+  if(f.size===0){label="Hide All";}
+  else{label=f.size+" Selected";}
+  // Rebuild label prefix
+  var prefix={"town":"Town","type":"Type","cat":"Cat","mapmod":"Map Mod"}[k]||k;
+  btn.textContent=prefix+": "+label+" ▾";
+  btn.classList.add("active");
+}
+
 setupFilters();
 window.addEventListener("resize",resize);
 window.addEventListener("load",function(){resize();document.getElementById("iTotal").textContent=pts.length;draw();});
