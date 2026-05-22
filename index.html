@@ -211,7 +211,7 @@ function getVis(){
 function draw(){
   bgX.clearRect(0,0,W,H);dx.clearRect(0,0,W,H);bgX.fillStyle="#1a1f1a";bgX.fillRect(0,0,W,H);
   if(imgOk)bgX.drawImage(imgEl,vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);
-  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Load Map to see 'Random Spawn Locations'",vx+20,vy+30);}
+  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Click 'Load Map' to see 'Random Spawn Locations' - Map is a 32MB file. Be patient if on a Mobile Device and/or using WiFi",vx+20,vy+30);}
   var vis=getVis();
   document.getElementById("iVis").textContent=vis.length;
   document.getElementById("iBal").textContent=pts.filter(function(p){return p.bal;}).length;
