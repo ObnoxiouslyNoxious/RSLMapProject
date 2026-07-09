@@ -48,7 +48,6 @@ canvas{position:absolute;top:0;left:0}
 #zbtn button{width:26px;height:26px;font-size:14px;padding:0;text-align:center}
 #copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:12px;display:none;z-index:200;pointer-events:none}
 
-/* Multi-select filter dropdowns */
 .flt-wrap{position:relative;display:inline-block}
 .flt-btn{background:#222;border:1px solid #444;color:#ddd;padding:3px 20px 3px 6px;font-size:11px;font-family:monospace;cursor:pointer;border-radius:2px;white-space:nowrap}
 .flt-btn:hover{border-color:#777}
@@ -164,7 +163,6 @@ var CAL_SX=0.24979608;var CAL_OX=70.4375;var CAL_SY=0.24990000;var CAL_OY=65.054
 var pts=D.points.map(function(p){return{id:p[0],ax:p[1],ay:p[2],wx:p[3],wy:p[4],px:p[5],py:p[6],pz:p[7],ti:p[8],xi:p[9],ci:p[10],c2i:p[11],hc:!!p[12],mt:!!p[13],note:p[14],bal:false,wild:false};});
 var stateMap={};SAVED_STATE.forEach(function(s){stateMap[s.id]=s;});
 pts.forEach(function(p){var s=stateMap[p.id];if(s){p.bal=!!s.bal;p.hc=!!s.hc;p.wild=!!s.wild;p.mt=!!s.mt;if(s.ti!==undefined)p.ti=s.ti;if(s.xi!==undefined)p.xi=s.xi;if(s.ci!==undefined)p.ci=s.ci;if(s.note)p.note=s.note;}});
-// Convert world coords to pixel coords using calibration values
 function w2p(ax,ay){return[ax*CAL_SX+CAL_OX, ay*CAL_SY+CAL_OY];}
 
 var vx=0,vy=0,vz=1,W=0,H=0,drag=false,dsx,dsy,dvx,dvy,selId=null,mode=null,fTown=null,fType=null,fCat=null,fMapMod=null,tab="towns",imgEl=null,imgOk=false,_selPt=null;
@@ -177,18 +175,13 @@ function getVis(){
   var MAP_MOD_INDICES=[16,17,18];
   var ISO_INDEX=8;
   return pts.filter(function(p){
-    // Isolated Areas button mode - isolate view, otherwise always show
     if(mode==="isolated") return p.ti===ISO_INDEX;
-    // Wilderness mode - show only wilderness points
     if(mode==="wilderness") return p.wild===true;
-    // Isolated Areas always visible by default (unless explicitly hidden via town filter)
     if(p.ti===ISO_INDEX && fTown==="__hide__") return false;
     if(p.ti===ISO_INDEX && fTown && fTown!=="Isolated Areas" && fTown!=="__hide__") return false;
-    // Map Mod filter
     var isMapMod=MAP_MOD_INDICES.indexOf(p.ti)!==-1;
     if(fMapMod==="__hide__" && isMapMod) return false;
     if(fMapMod && fMapMod!=="__hide__" && fMapMod!=="__show__") { if(TOWNS[p.ti]!==fMapMod) return false; }
-    // If a map mod is selected via fMapMod, skip town filter for those
     if(fTown==="__hide__") return false;
     if(fTown && !isMapMod) { if(TOWNS[p.ti]!==fTown) return false; }
     if(fType==="__hide__") return false;
@@ -270,13 +263,11 @@ function searchById(){
   for(var i=0;i<pts.length;i++){if(pts[i].id===id){p=pts[i];break;}}
   if(!p){res.textContent="ID "+id+" not found";res.style.color="#fa7a7a";return;}
   res.textContent="";
-  // Pan and zoom to point
   var ip=w2p(p.ax,p.ay),ix=ip[0],iy=ip[1];
   var targetZoom=4;
   vz=targetZoom;
   vx=W/2-ix*vz;
   vy=H/2-iy*vz;
-  // Select and highlight
   selId=p.id;
   showEdit(p);
   draw();
@@ -287,7 +278,6 @@ function searchById(){
 
 
 function exportLua(){
-  // Categorise points into buckets
   var bal=[],hc=[],wild=[];
   var resAll=[],nrlAll=[],nroAll=[];
   var modAT=[],modMP=[],modRC=[];
@@ -302,7 +292,6 @@ function exportLua(){
     if(p.xi===1&&p.ti===9){nrlAll.push(p);return;}
     if(p.xi===1){nroAll.push(p);return;}
   });
-  // Split residential/nonres into a/b halves
   var mid;
   mid=Math.ceil(resAll.length/2); var resA=resAll.slice(0,mid),resB=resAll.slice(mid);
   mid=Math.ceil(nrlAll.length/2); var nrlA=nrlAll.slice(0,mid),nrlB=nrlAll.slice(mid);
@@ -339,7 +328,6 @@ function exportLua(){
     "RSL_sp_modded_RavenCreek.lua":      makeLua("RSL_SpawnPoints_Modded_RavenCreek",modRC)
   };
 
-  // Build zip using JSZip
   var zip=new JSZip();
   var folder=zip.folder("RSL_spawnpoints");
   Object.keys(files).forEach(function(name){folder.file(name,files[name]);});
@@ -389,7 +377,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
     lbl.appendChild(cb);lbl.appendChild(document.createTextNode(t));
     modPanel.appendChild(lbl);
   });
-  // Close panels when clicking outside
   document.addEventListener("click",function(e){
     ["town","type","cat","mapmod"].forEach(function(k){
       var wrap=document.getElementById("wrap-"+k);
@@ -440,7 +427,6 @@ function toggleFilterItem(k,val,checked){
   var cur=(k==="town"?fTown:k==="type"?fType:k==="cat"?fCat:fMapMod);
   if(cur===null) cur=new Set(all);
   if(checked){cur.add(val);}else{cur.delete(val);}
-  // If all checked, reset to null (Show All)
   if(cur.size===all.length) cur=null;
   if(k==="town") fTown=cur;
   else if(k==="type") fType=cur;
@@ -462,7 +448,6 @@ function updateFilterBtn(k){
   var label;
   if(f.size===0){label="Hide All";}
   else{label=f.size+" Selected";}
-  // Rebuild label prefix
   var prefix={"town":"Town","type":"Type","cat":"Cat","mapmod":"Map Mod"}[k]||k;
   btn.textContent=prefix+": "+label+" ▾";
   btn.classList.add("active");
