@@ -68,7 +68,7 @@ canvas{position:absolute;top:0;left:0}
   <div class="tb-group">
     <select id="mapSelect">
       <option value="knoxmap.jpg">Knox Country</option>
-      <option value="indianamap.png">Indiana</option>
+      <option value="indianamap.jpg">Indiana</option>
     </select>
     <button onclick="loadImg()">Load Map</button>
   </div>
@@ -465,7 +465,7 @@ function loadImg(){
   var sel=document.getElementById("mapSelect");
   if(!sel)return;
   var path=sel.value;
-  activeMap=(path==="indianamap.png")?"indiana":"knox";
+  activeMap=(path==="indianamap.jpg")?"indiana":"knox";
   var cal=activeMap==="indiana"?INDIA_CAL:KNOX_CAL;
   CAL_SX=cal.sx;CAL_OX=cal.ox;CAL_SY=cal.sy;CAL_OY=cal.oy;
   var calUI=document.getElementById("indiana-cal");
