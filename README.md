@@ -6,6 +6,8 @@
 
 A web-based spawn point viewer for the [Random Spawn Locations (RSL)](https://steamcommunity.com/sharedfiles/filedetails/?id=3730705272) Mod for Project Zomboid.
 
+<img width="959" height="539" alt="image" src="https://github.com/user-attachments/assets/74f89bac-b8eb-4889-9959-c0a8aa840695" />
+
 ## Features
 
 - **Interactive map** — Click to view spawn point details
