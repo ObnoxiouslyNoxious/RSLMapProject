@@ -14,7 +14,13 @@ select,button,input[type=text]{background:#222;border:1px solid #444;color:#ddd;
 select:hover,button:hover{border-color:#777}
 button.on{background:#1a3a1a;border-color:#3a7a3a;color:#7afa7a}
 #main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:300px;background:#111;border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#sidebar{width:300px;background:#111;border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
+#sidebar-toggle{position:absolute;left:300px;top:50%;transform:translateY(-50%);width:20px;height:48px;background:#1a1a1a;border:1px solid #444;border-left:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;border-radius:0 4px 4px 0;margin-left:-1px}
+#sidebar-toggle:hover{background:#222;border-color:#777}
+#sidebar-toggle img{width:14px;height:14px;image-rendering:pixelated;filter:brightness(0) invert(75%) sepia(100%) saturate(2000%) hue-rotate(10deg) brightness(90%)}
+#sidebar.hidden{width:0;min-width:0;border:none;overflow:hidden;padding:0}
+#sidebar.hidden #stabs,#sidebar.hidden #scontent,#sidebar.hidden #sidebar-footer{display:none}
+#sidebar.hidden~#sidebar-toggle{left:0}
 #stabs{display:flex;border-bottom:1px solid #333}
 .stab{flex:1;padding:5px;text-align:center;font-size:10px;cursor:pointer;color:#555;border-bottom:2px solid transparent}
 .stab.on{color:#aaa;border-bottom-color:#4a8aaa}
@@ -132,6 +138,7 @@ canvas{position:absolute;top:0;left:0}
     </div>
   <div style="padding:8px 0;text-align:center;flex-shrink:0;border-top:1px solid #222"><a href="https://obnoxiouslynoxious.github.io/" target="_blank" style="display:inline-block"><img src="img/obnox.png" style="width:28px;height:28px;border-radius:50%;border:1px solid #444;display:block;image-rendering:pixelated" title="ObnoxiouslyNoxious"></a></div>
   </div>
+  <div id="sidebar-toggle" onclick="toggleSidebar()"><img src="img/arrow_left.png" id="sidebar-toggle-img"></div>
   <div id="mapwrap">
     <canvas id="bgC"></canvas>
     <canvas id="dotC"></canvas>
@@ -168,6 +175,15 @@ var INDIANA_INDICES=[19,20,21];
 var pts=D.points.map(function(p){return{id:p[0],ax:p[1],ay:p[2],wx:p[3],wy:p[4],px:p[5],py:p[6],pz:p[7],ti:p[8],xi:p[9],ci:p[10],hc:!!p[12],mt:!!p[13],note:p[14],bal:false,wild:false};});
 var stateMap={};SAVED_STATE.forEach(function(s){stateMap[s.id]=s;});
 pts.forEach(function(p){var s=stateMap[p.id];if(s){p.bal=!!s.bal;p.hc=!!s.hc;p.wild=!!s.wild;p.mt=!!s.mt;if(s.ti!==undefined)p.ti=s.ti;if(s.xi!==undefined)p.xi=s.xi;if(s.ci!==undefined)p.ci=s.ci;if(s.note)p.note=s.note;}});
+var sidebarVisible=true;
+function toggleSidebar(){
+  var sb=document.getElementById("sidebar");
+  var img=document.getElementById("sidebar-toggle-img");
+  sidebarVisible=!sidebarVisible;
+  sb.classList.toggle("hidden",!sidebarVisible);
+  img.src=sidebarVisible?"img/arrow_left.png":"img/arrow_right.png";
+  setTimeout(resize,50);
+}
 // Convert world coords to pixel coords using calibration values
 function w2p(ax,ay){return[ax*CAL_SX+CAL_OX, ay*CAL_SY+CAL_OY];}
 
