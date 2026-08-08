@@ -176,6 +176,14 @@ var pts=D.points.map(function(p){return{id:p[0],ax:p[1],ay:p[2],wx:p[3],wy:p[4],
 var stateMap={};SAVED_STATE.forEach(function(s){stateMap[s.id]=s;});
 pts.forEach(function(p){var s=stateMap[p.id];if(s){p.bal=!!s.bal;p.hc=!!s.hc;p.wild=!!s.wild;p.mt=!!s.mt;if(s.ti!==undefined)p.ti=s.ti;if(s.xi!==undefined)p.xi=s.xi;if(s.ci!==undefined)p.ci=s.ci;if(s.note)p.note=s.note;}});
 var sidebarVisible=true;
+function hideSidebar(){
+  var sb=document.getElementById("sidebar");
+  var img=document.getElementById("sidebar-toggle-img");
+  sidebarVisible=false;
+  sb.classList.add("hidden");
+  img.src="img/arrow_right.png";
+  setTimeout(resize,50);
+}
 function toggleSidebar(){
   var sb=document.getElementById("sidebar");
   var img=document.getElementById("sidebar-toggle-img");
@@ -576,7 +584,7 @@ function updateFilterBtn(k){
 }
 
 window.addEventListener("resize",resize);
-window.addEventListener("load",function(){resize();setTab("towns");setupFilters();renderTowns();renderStats();document.getElementById("iTotal").textContent=pts.length;draw();});
+window.addEventListener("load",function(){resize();setTab("towns");setupFilters();renderTowns();renderStats();document.getElementById("iTotal").textContent=pts.length;hideSidebar();if(window.location.hash==="#hidden"){hideAllPins();}draw();});
 
 </script>
 </body>
