@@ -80,6 +80,18 @@ canvas{position:absolute;top:0;left:0}
   </div>
   <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
   <div class="tb-group">
+    <button onclick="hideAllPins()" style="color:#bf9c00">Hide All Pins</button>
+    <button onclick="showAllPins()" style="color:#bf9c00">Show All Pins</button>
+  </div>
+  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-group">
+    <button id="bBal" onclick="toggleMode('balance')">Balanced</button>
+    <button id="bHc" onclick="toggleMode('hardcore')">Hardcore</button>
+    <button id="bIso" onclick="toggleMode('isolated')">Isolated Areas</button>
+    <button id="bWild" onclick="toggleMode('wilderness')">Wilderness</button>
+  </div>
+  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-group">
     <span class="tb-label">Town:</span>
     <div class="flt-wrap" id="wrap-town">
       <button class="flt-btn" id="btn-town" onclick="togglePanel('town')">Show All ▾</button>
@@ -105,19 +117,7 @@ canvas{position:absolute;top:0;left:0}
       </div>
     </div>
   </div>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
-  <div class="tb-group">
-    <button id="bBal" onclick="toggleMode('balance')">Balanced</button>
-    <button id="bHc" onclick="toggleMode('hardcore')">Hardcore</button>
-    <button id="bIso" onclick="toggleMode('isolated')">Isolated Areas</button>
-    <button id="bWild" onclick="toggleMode('wilderness')">Wilderness</button>
-  </div>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
-  <div class="tb-group">
-    <button onclick="hideAllPins()" style="color:#bf9c00">Hide All Pins</button>
-    <button onclick="showAllPins()" style="color:#bf9c00">Show All Pins</button>
-  </div>
-<div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div style="flex:1"></div>
   <div class="tb-group">
     <span class="tb-label">Search ID:</span>
     <input type="text" id="searchId" placeholder="e.g. 653" style="width:55px" onkeydown="if(event.key==='Enter')searchById()">
