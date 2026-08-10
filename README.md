@@ -1,8 +1,15 @@
 # RSL Map Project
 
-[![Latest Release](https://img.shields.io/github/v/release/ObnoxiouslyNoxious/RSLMapProject)](https://github.com/ObnoxiouslyNoxious/RSLMapProject/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-View-blue)](https://obnox.dev/RSLMapProject/)
+[![Game: Project Zomboid](https://images.obnox.dev/GAME_PROJECTZOMBOID)](https://steamcommunity.com/app/108600)
+[![Latest Release](https://images.obnox.dev/RELEASE_v1.0.0)](https://github.com/ObnoxiouslyNoxious/RSLMapProject/releases/latest)
+[![License: MIT](https://images.obnox.dev/LICENSE_MIT)](https://opensource.org/licenses/MIT)
+[![Live Demo](https://images.obnox.dev/LIVEDEMO_VIEW)](https://obnox.dev/RSLMapProject/)
+
+[![View my Steam Workshop Page](https://images.obnox.dev/WORKSHOP_VIEW)](https://steamcommunity.com/id/ObnoxiouslyNoxious/myworkshopfiles)
+[![Visit my Website](https://images.obnox.dev/WEBSITE_VISIT)](https://obnox.dev)
+[![Join My Discord](https://images.obnox.dev/DISCORD_JOIN)](https://obnox.dev/discord)
+[![Support me on KoFi](https://images.obnox.dev/KOFI_SUPPORT)](https://obnox.dev/kofi)
+
 
 A web-based spawn point viewer for the [Random Spawn Locations (RSL)](https://steamcommunity.com/sharedfiles/filedetails/?id=3730705272) Mod for Project Zomboid.
 
