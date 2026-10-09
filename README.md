@@ -18,11 +18,11 @@ A web-based spawn point viewer for the [Random Spawn Locations (RSL)](https://st
 
 ## Features
 
-- **Interactive map** — Click to view spawn point details
-- **Multi-select filters** — Filter by Town, Type, Category, and Map Mods
-- **Spawn point details** — View spawn point data and coordinates
-- **Multiple maps** — Knox Country and Indiana support
-- **Real-time search** — Find spawn points quickly
+- **Interactive map**: Click to view spawn point details
+- **Multi-select filters**: Filter by Town, Type, Category, and Map Mods
+- **Spawn point details**: View spawn point data and coordinates
+- **Multiple maps**: Knox Country and Indiana support
+- **Real-time search**: Find spawn points quickly
 
 ## Live Demo
 
@@ -37,7 +37,7 @@ A web-based spawn point viewer for the [Random Spawn Locations (RSL)](https://st
 
 ## Local Development
 
-To run locally, simply open `index.html` in a web browser — no server required.
+To run locally, simply open `index.html` in a web browser, no server required.
 
 ```bash
 # Or use a local server

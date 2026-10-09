@@ -53,7 +53,6 @@ canvas{position:absolute;top:0;left:0}
 #zbtn button{width:26px;height:26px;font-size:14px;padding:0;text-align:center}
 #copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:12px;display:none;z-index:200;pointer-events:none}
 
-/* Multi-select filter dropdowns */
 .flt-wrap{position:relative;display:inline-block}
 .flt-btn{background:#222;border:1px solid #444;color:#ddd;padding:3px 20px 3px 6px;font-size:11px;font-family:monospace;cursor:pointer;border-radius:2px;white-space:nowrap}
 .flt-btn:hover{border-color:#777}
@@ -512,7 +511,7 @@ function loadImg(){
       var off=document.createElement("canvas");
       off.width=targetW;off.height=targetH;
       off.getContext("2d").drawImage(srcImg,0,0,targetW,targetH);
-      imgEl=off; // canvas works as a drawImage source exactly like an Image
+      imgEl=off;
     }
     D.meta.pngW=targetW;D.meta.pngH=targetH;
     imgOk=true;resetView();draw();
