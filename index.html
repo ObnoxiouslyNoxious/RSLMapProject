@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=980">
 <title>Random Spawn Locations Map</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -70,17 +70,8 @@ canvas{position:absolute;top:0;left:0}
 /* Phones and tablets */
 @supports(height:100dvh){body{height:100dvh}}
 canvas{touch-action:none}
-@media (pointer:coarse),(max-width:700px){
-  #main{position:relative}
-  #sidebar{position:absolute;top:0;bottom:0;left:0;z-index:20;width:min(300px,80vw)}
-  #sidebar-toggle{left:min(300px,80vw);z-index:21;width:28px;height:56px}
-  #sidebar.hidden~#sidebar-toggle{left:0}
-  #topbar{padding:4px 6px}
-  #topbar>div[style*="width:1px"]{display:none}
-  select,button,input[type=text]{font-size:14px;padding:6px 10px}
-  .flt-item{padding:8px 10px}
+@media (pointer:coarse){
   #zbtn button{width:40px;height:40px;font-size:18px}
-  #infobar{flex-wrap:wrap;gap:4px 12px}
 }
 </style>
 </head>
