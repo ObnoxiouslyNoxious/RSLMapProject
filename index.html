@@ -199,7 +199,6 @@ function toggleSidebar(){
   img.src=sidebarVisible?"img/arrow_left.png":"img/arrow_right.png";
   setTimeout(resize,50);
 }
-// Convert world coords to pixel coords using calibration values
 function w2p(ax,ay){return[ax*CAL_SX+CAL_OX, ay*CAL_SY+CAL_OY];}
 
 var vx=0,vy=0,vz=1,W=0,H=0,drag=false,dsx,dsy,dvx,dvy,selId=null,mode=null,allPinsHidden=false,fTown=null,fType=null,fCat=null,fMapMod=null,tab="towns",imgEl=null,imgOk=false,_selPt=null;
@@ -348,13 +347,11 @@ function searchById(){
   for(var i=0;i<pts.length;i++){if(pts[i].id===id){p=pts[i];break;}}
   if(!p){res.textContent="ID "+id+" not found";res.style.color="#fa7a7a";return;}
   res.textContent="";
-  // Pan and zoom to point
   var ip=w2p(p.ax,p.ay),ix=ip[0],iy=ip[1];
   var targetZoom=4;
   vz=targetZoom;
   vx=W/2-ix*vz;
   vy=H/2-iy*vz;
-  // Select and highlight
   selId=p.id;
   showEdit(p);
   draw();
@@ -373,7 +370,6 @@ function applyIndianaCal(){
 }
 
 function exportLua(){
-  // Categorise points into buckets
   var balRes=[],balNonRes=[],hc=[],wild=[],iso=[];
   var resAll=[],nrlAll=[],nroAll=[];
   var modAT=[],modMP=[],modRC=[];
@@ -407,7 +403,7 @@ function exportLua(){
     if(p.xi===1&&p.ti===9){nrlAll.push(p);return;}
     if(p.xi===1){nroAll.push(p);return;}
   });
-  // Split residential/nonres into a/b halves
+
   var mid;
   mid=Math.ceil(resAll.length/2); var resA=resAll.slice(0,mid),resB=resAll.slice(mid);
   mid=Math.ceil(nrlAll.length/2); var nrlA=nrlAll.slice(0,mid),nrlB=nrlAll.slice(mid);
@@ -469,7 +465,6 @@ function exportLua(){
     "RSL_sp_modded_BegoniaTown.lua": makeLua("RSL_SpawnPoints_Modded_BegoniaTown",modBG)
   };
 
-  // Build zip using JSZip
   var zip=new JSZip();
   var folder=zip.folder("RSL_spawnpoints");
   Object.keys(files).forEach(function(name){folder.file(name,files[name]);});
@@ -486,7 +481,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
   var MAP_MOD_INDICES=[16,17,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42];
   var ISO_INDEX=8,WILD_INDEX=22;
 
-  // Town panel - exclude Isolated(8), Wilderness(22), and Map Mods
   var townPanel=document.getElementById("panel-town");
   ["all","none"].forEach(function(a){
     var btn=document.createElement("button");btn.className="flt-action";
@@ -510,7 +504,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
     townPanel.appendChild(lbl);
   });
 
-  // Type panel - hide None
   var typePanel=document.getElementById("panel-type");
   ["all","none"].forEach(function(a){
     var btn=document.createElement("button");btn.className="flt-action";
@@ -535,7 +528,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
     typePanel.appendChild(lbl);
   })();
 
-  // Cat panel - hide None
   var catPanel=document.getElementById("panel-cat");
   ["all","none"].forEach(function(a){
     var btn=document.createElement("button");btn.className="flt-action";
@@ -552,7 +544,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
     catPanel.appendChild(lbl);
   });
 
-  // Map Mods panel
   var modPanel=document.getElementById("panel-mapmod");
   ["all","none"].forEach(function(a){
     var btn=document.createElement("button");btn.className="flt-action";
@@ -569,7 +560,6 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
     modPanel.appendChild(lbl);
   });
 
-  // Close panels when clicking outside
   document.addEventListener("click",function(e){
     ["town","type","cat","mapmod"].forEach(function(k){
       var wrap=document.getElementById("wrap-"+k);
@@ -700,10 +690,6 @@ function loadImg(forceFull){
     var srcImg=imgEl,nw=srcImg.naturalWidth,nh=srcImg.naturalHeight;
     var targetW=activeMap==="indiana"?2100:5117,targetH=activeMap==="indiana"?833:4157;
     if(nw!==targetW||nh!==targetH){
-      // D.meta.pngW/H stay at the calibration size below; draw() scales the
-      // source into that space, so a smaller source keeps pins aligned.
-      // Phones: iOS Safari silently blanks canvases over ~16.7MP, so use the
-      // phone-sized image as-is, or cap the resample canvas at 12MP.
       var cw=targetW,ch=targetH;
       if(IS_MOBILE){
         if(nw*nh<=16000000){cw=0;}
@@ -713,7 +699,7 @@ function loadImg(forceFull){
         var off=document.createElement("canvas");
         off.width=cw;off.height=ch;
         off.getContext("2d").drawImage(srcImg,0,0,cw,ch);
-        imgEl=off; // canvas works as a drawImage source exactly like an Image
+        imgEl=off;
       }
     }
     D.meta.pngW=targetW;D.meta.pngH=targetH;
@@ -764,7 +750,6 @@ function toggleFilterItem(k,val,checked){
   var cur=(k==="town"?fTown:k==="type"?fType:k==="cat"?fCat:fMapMod);
   if(cur===null) cur=new Set(all);
   if(checked){cur.add(val);}else{cur.delete(val);}
-  // If all checked, reset to null (Show All)
   if(cur.size===all.length) cur=null;
   if(k==="town") fTown=cur;
   else if(k==="type") fType=cur;
@@ -786,7 +771,6 @@ function updateFilterBtn(k){
   var label;
   if(f.size===0){label="Hide All";}
   else{label=f.size+" Selected";}
-  // Rebuild label prefix
   var prefix={"town":"Locations","type":"Type","cat":"Cat","mapmod":"Map Mod"}[k]||k;
   btn.textContent=prefix+": "+label+" ▾";
   btn.classList.add("active");
