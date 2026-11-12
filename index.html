@@ -78,12 +78,11 @@ canvas{touch-action:none}
   <h1>Random Spawn Locations Map</h1>
   <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
   <div class="tb-group">
-    <select id="mapSelect">
+    <select id="mapSelect" onchange="loadImg()">
       <option value="knoxvector">World Vector</option>
       <option value="knoxmap.jpg">World Paper</option>
       <option value="indianamap.jpg">Indiana Paper</option>
     </select>
-    <button onclick="loadImg()">Load Map</button>
   </div>
   <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
   <div class="tb-group">
@@ -813,7 +812,7 @@ function updateFilterBtn(k){
 }
 
 window.addEventListener("resize",resize);
-window.addEventListener("load",function(){resize();setTab("towns");setupFilters();renderTowns();renderStats();document.getElementById("iTotal").textContent=pts.length;hideSidebar();if(IS_TOUCH){document.getElementById("hint").textContent="Pinch = Zoom  |  Drag = Pan  |  Tap a pin = Details";}if(window.location.hash==="#hidden"){hideAllPins();}draw();});
+window.addEventListener("load",function(){resize();setTab("towns");setupFilters();renderTowns();renderStats();document.getElementById("iTotal").textContent=pts.length;hideSidebar();if(IS_TOUCH){document.getElementById("hint").textContent="Pinch = Zoom  |  Drag = Pan  |  Tap a pin = Details";}if(window.location.hash==="#hidden"){hideAllPins();}draw();loadImg();});
 
 </script>
 </body>
