@@ -244,7 +244,7 @@ function draw(){
 function drawNow(){
   bgX.clearRect(0,0,W,H);dx.clearRect(0,0,W,H);bgX.fillStyle="#1a1f1a";bgX.fillRect(0,0,W,H);
   if(imgOk&&vectorMode){ensureVectorExtras();drawVectorCached(bgX);}else if(imgOk)bgX.drawImage(imgEl,vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);
-  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Click 'Load Map' to load the World Map.",vx+20,vy+30);bgX.fillText("File is 32MB.",vx+20,vy+50);bgX.fillText("Be patient for Map to load if on a Mobile device and/or Wifi.",vx+20,vy+70);}
+  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Loading the map...",vx+20,vy+30);bgX.fillText("The World Paper file is 32MB.",vx+20,vy+50);bgX.fillText("Be patient for Map to load if on a Mobile device and/or Wifi.",vx+20,vy+70);}
   var vis=getVis();
   document.getElementById("iVis").textContent=vis.length;
   if(statBal===null){statBal=pts.filter(function(p){return p.bal;}).length;statHc=pts.filter(function(p){return p.hc;}).length;}
