@@ -11,7 +11,7 @@
 @font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/BarlowCondensed-700.woff2") format("woff2")}
 :root{--bg:#0d0d0d;--text:#e0e0e0;--muted:#9aa0a8;--dim:#6c727a;--line:#2b2f36;--field:#101215;--accent:#7fd17a;--blue:#7ac8fa;--amber:#bf9c00}
 *{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#3a3d42 #0d0d0d}
-body{font-family:"Barlow Condensed","Arial Narrow",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:500;font-size:14px;letter-spacing:.02em;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+body{font-family:"Barlow Condensed","Arial Narrow",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:500;font-size:14px;letter-spacing:.02em;text-transform:uppercase;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden}
 a{color:#9fb4ff}
 #topbar,#bottombar,#infobar{border:7px solid transparent;border-image:url("img/InkRoll.png") 55 fill/7px stretch;background:none;flex-shrink:0}
 #topbar{padding:1px 8px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
@@ -19,7 +19,12 @@ a{color:#9fb4ff}
 .tb-group{display:flex;align-items:center;gap:5px;flex-shrink:0}
 .tb-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .tb-sep{width:1px;height:20px;background:var(--line);margin:0;flex-shrink:0}
-@media (max-width:1552px){#topbar .tb-search{margin-left:auto}#topbar .tb-sep-search{display:none}}
+.t-short,.lbl-short{display:none}
+#topbar.tb-compact{gap:4px}
+#topbar.tb-compact .tb-sep,#topbar.tb-compact .tb-search .tb-label{display:none}
+#topbar.tb-compact .t-full,#topbar.tb-compact .lbl-full{display:none}
+#topbar.tb-compact .t-short,#topbar.tb-compact .lbl-short{display:inline}
+#topbar.tb-compact .tb-group{gap:3px}
 button,.flt-btn{font:600 13px/1 "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--text);background:none;border:5px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/5px stretch;border-radius:0;padding:2px 6px;cursor:pointer}
 button:hover,.flt-btn:hover{filter:brightness(1.4)}
 button:disabled{opacity:.45;cursor:default}
@@ -27,15 +32,15 @@ button.on,.b-add,.asp-btn-add{border-image-source:url("img/InkRollInnerGreen.png
 .b-edit,.flt-btn.active,.cpy-btn{border-image-source:url("img/InkRollInnerBlue.png");color:#e8f4fb}
 .b-pub{border-image-source:url("img/InkRollInnerPurple.png");color:#f7e9f9}
 .b-amber{color:#e0b800}
-select,input[type=text],input[type=number],textarea{font:500 13px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:none;letter-spacing:.02em;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:3px;padding:3px 6px;cursor:pointer}
+select,input[type=text],input[type=number],textarea{font:500 13px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:3px;padding:3px 6px;cursor:pointer}
 input[type=text],input[type=number],textarea{cursor:text}
 select:hover,input[type=text]:hover,input[type=number]:hover,textarea:hover{border-color:#555}
 select:focus,input[type=text]:focus,input[type=number]:focus,textarea:focus{outline:none;border-color:var(--accent)}
-option{background:#16181c;color:var(--text)}
+option{background:#16181c;color:var(--text);text-transform:uppercase}
 ::placeholder{color:#5b616a}
 #main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:340px;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
-#sidebar-toggle{position:absolute;left:340px;top:50%;transform:translateY(-50%);width:24px;height:54px;border:5px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/5px stretch;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;margin-left:-1px}
+#sidebar{width:360px;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
+#sidebar-toggle{position:absolute;left:360px;top:50%;transform:translateY(-50%);width:24px;height:54px;border:5px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/5px stretch;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;margin-left:-1px}
 #sidebar-toggle:hover{filter:brightness(1.4)}
 #sidebar-toggle img{width:16px;height:16px;filter:brightness(0) invert(75%) sepia(100%) saturate(2000%) hue-rotate(10deg) brightness(90%)}
 #sidebar.hidden{width:0;min-width:0;border:none;overflow:hidden;padding:0}
@@ -76,7 +81,8 @@ canvas{position:absolute;top:0;left:0}
 #zbtn button{width:32px;height:32px;font-size:17px;padding:0;text-align:center}
 #copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:15px;font-weight:600;letter-spacing:.04em;display:none;z-index:200;pointer-events:none}
 .flt-wrap{position:relative;display:inline-block}
-.flt-btn{padding:2px 18px 2px 6px;white-space:nowrap}
+.flt-btn{padding:2px 8px;white-space:nowrap}
+.flt-count{display:inline-block;width:2.4ch;text-align:left;font-variant-numeric:tabular-nums}
 .flt-panel{display:none;position:absolute;top:100%;left:0;z-index:500;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;min-width:190px;max-height:300px;overflow-y:auto;margin-top:2px}
 .flt-panel.open{display:block}
 .flt-action{display:block;width:100%;text-align:left;padding:3px 6px;font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none;border-image:none;border-bottom:1px solid #22262b;border-radius:0}
@@ -84,12 +90,12 @@ canvas{position:absolute;top:0;left:0}
 .flt-item{display:flex;align-items:center;padding:3px 6px;cursor:pointer;font-size:14px;color:#ccc;gap:6px}
 .flt-item:hover{background:rgba(255,255,255,.06)}
 .flt-item input[type=checkbox]{accent-color:var(--accent);cursor:pointer;flex-shrink:0}
-.cpy-btn{text-transform:none;letter-spacing:.02em}
+.cpy-btn{letter-spacing:.04em}
 .b-del{display:block;width:100%;margin-bottom:6px;border-image-source:url("img/InkRollInnerRed.png");color:#fbe9e9}
 .pz-link{display:block;color:#7aaafa;font-size:13px;margin-bottom:4px;text-decoration:none}
 .pz-link:hover{text-decoration:underline}
 .coord-note{margin-top:6px;color:var(--dim);font-size:12px}
-.top-logo{display:inline-flex;line-height:0;flex-shrink:0;margin-left:4px}
+.top-logo{display:inline-flex;line-height:0;flex-shrink:0}
 .top-logo img{width:34px;height:34px;filter:brightness(.65);transition:filter .15s}
 .top-logo:hover img{filter:brightness(1)}
 @supports(height:100dvh){body{height:100dvh}}
@@ -101,7 +107,7 @@ canvas{touch-action:none}
 </head>
 <body>
 <div id="topbar">
-  <h1>Random Spawn Locations Map</h1>
+  <h1><span class="t-full">Random Spawn Locations Map</span><span class="t-short">RSL Map</span></h1>
   <div class="tb-sep"></div>
   <div class="tb-group">
     <select id="mapSelect" onchange="loadImg()">
@@ -121,27 +127,23 @@ canvas{touch-action:none}
   </div>
   <div class="tb-sep"></div>
   <div class="tb-group">
-    <span class="tb-label">Locations:</span>
     <div class="flt-wrap" id="wrap-town">
-      <button class="flt-btn" id="btn-town" onclick="togglePanel('town')">Locations ▾</button>
+      <button class="flt-btn" id="btn-town" onclick="togglePanel('town')"><span class="lbl-full">Locations</span><span class="lbl-short">Loc</span>: <span class="flt-count">0</span> ▾</button>
       <div class="flt-panel" id="panel-town">
       </div>
     </div>
-    <span class="tb-label">Type:</span>
     <div class="flt-wrap" id="wrap-type">
-      <button class="flt-btn" id="btn-type" onclick="togglePanel('type')">Show All ▾</button>
+      <button class="flt-btn" id="btn-type" onclick="togglePanel('type')"><span class="lbl-full">Type</span><span class="lbl-short">Type</span>: <span class="flt-count">0</span> ▾</button>
       <div class="flt-panel" id="panel-type">
       </div>
     </div>
-    <span class="tb-label">Cat:</span>
     <div class="flt-wrap" id="wrap-cat">
-      <button class="flt-btn" id="btn-cat" onclick="togglePanel('cat')">Show All ▾</button>
+      <button class="flt-btn" id="btn-cat" onclick="togglePanel('cat')"><span class="lbl-full">Cat</span><span class="lbl-short">Cat</span>: <span class="flt-count">0</span> ▾</button>
       <div class="flt-panel" id="panel-cat">
       </div>
     </div>
-    <span class="tb-label">Map Mods:</span>
     <div class="flt-wrap" id="wrap-mapmod">
-      <button class="flt-btn" id="btn-mapmod" onclick="togglePanel('mapmod')">Show All ▾</button>
+      <button class="flt-btn" id="btn-mapmod" onclick="togglePanel('mapmod')"><span class="lbl-full">Map Mods</span><span class="lbl-short">Mods</span>: <span class="flt-count">0</span> ▾</button>
       <div class="flt-panel" id="panel-mapmod">
       </div>
     </div>
@@ -152,8 +154,9 @@ canvas{touch-action:none}
     <span class="tb-label">Search ID:</span>
     <input type="text" id="searchId" placeholder="e.g. 653" style="width:55px" onkeydown="if(event.key==='Enter')searchById()">
     <button onclick="searchById()">Go</button>
-    <a class="top-logo" href="https://obnox.dev/" target="_blank" rel="noopener"><img src="img/obnox-fly-footer.webp" width="34" height="34" alt="ObnoxiouslyNoxious" title="ObnoxiouslyNoxious"></a>
   </div>
+  <div class="tb-sep tb-sep-logo"></div>
+  <a class="top-logo" href="https://obnox.dev/" target="_blank" rel="noopener"><img src="img/obnox-fly-footer.webp" width="34" height="34" alt="ObnoxiouslyNoxious" title="ObnoxiouslyNoxious"></a>
   </div>
 
 <div id="main">
@@ -270,7 +273,7 @@ function draw(){
 function drawNow(){
   bgX.clearRect(0,0,W,H);dx.clearRect(0,0,W,H);bgX.fillStyle="#1a1f1a";bgX.fillRect(0,0,W,H);
   if(imgOk&&vectorMode){ensureVectorExtras();drawVectorCached(bgX);}else if(imgOk)bgX.drawImage(imgEl,vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);
-  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="13px monospace";bgX.fillText("Loading the map...",vx+20,vy+30);bgX.fillText("The World Paper file is 32MB.",vx+20,vy+50);bgX.fillText("Be patient for Map to load if on a Mobile device and/or Wifi.",vx+20,vy+70);}
+  else{bgX.fillStyle="#111";bgX.fillRect(vx,vy,D.meta.pngW*vz,D.meta.pngH*vz);bgX.fillStyle="#444";bgX.font="600 15px 'Barlow Condensed',sans-serif";bgX.fillText("LOADING THE MAP...",vx+20,vy+30);bgX.fillText("THE WORLD PAPER FILE IS 32MB.",vx+20,vy+50);bgX.fillText("BE PATIENT FOR MAP TO LOAD IF ON A MOBILE DEVICE AND/OR WIFI.",vx+20,vy+70);}
   var vis=getVis();
   document.getElementById("iVis").textContent=vis.length;
   if(statBal===null){statBal=pts.filter(function(p){return p.bal;}).length;statHc=pts.filter(function(p){return p.hc;}).length;}
@@ -385,7 +388,7 @@ function searchById(){
   vx=W/2-ix*vz;
   vy=H/2-iy*vz;
   selId=p.id;
-  showEdit(p);
+  if(typeof showEdit==="function")showEdit(p);
   draw();
 }
 
@@ -600,6 +603,7 @@ function setupFilters(){if(_filtersBuilt)return;_filtersBuilt=true;
       }
     });
   });
+  ["town","type","cat","mapmod"].forEach(updateFilterBtn);
 }
 
 var vectorMode=false,vecToken=0;
@@ -826,18 +830,38 @@ function syncCheckboxes(k,s){
 }
 function updateFilterBtn(k){
   var btn=document.getElementById("btn-"+k);
+  if(!btn)return;
   var f=(k==="town"?fTown:k==="type"?fType:k==="cat"?fCat:fMapMod);
-  if(f===null){btn.textContent=({"town":"Locations","mapmod":"Map Mod"}[k]||k.charAt(0).toUpperCase()+k.slice(1))+" ▾";btn.classList.remove("active");return;}
-  if(k==="btn-town") k="town";
-  var label;
-  if(f.size===0){label="Hide All";}
-  else{label=f.size+" Selected";}
-  var prefix={"town":"Locations","type":"Type","cat":"Cat","mapmod":"Map Mod"}[k]||k;
-  btn.textContent=prefix+": "+label+" ▾";
-  btn.classList.add("active");
+  var panel=document.getElementById("panel-"+k);
+  var n=panel?panel.querySelectorAll("input[type=checkbox]:checked").length:0;
+  var prefix={"town":"Locations","type":"Type","cat":"Cat","mapmod":"Map Mods"}[k]||k;
+  var short={"town":"Loc","type":"Type","cat":"Cat","mapmod":"Mods"}[k]||k;
+  btn.innerHTML='<span class="lbl-full">'+prefix+'</span><span class="lbl-short">'+short+'</span>: <span class="flt-count">'+n+'</span> ▾';
+  btn.classList.toggle("active",f!==null);
 }
 
+function fitHeader(){
+  var bar=document.getElementById("topbar");if(!bar)return;
+  var was=bar.classList.contains("tb-compact");
+  bar.classList.remove("tb-compact");
+  var kids=[].slice.call(bar.children).filter(function(el){var c=getComputedStyle(el);return c.display!=="none"&&c.position!=="absolute";});
+  var keep=bar.style.cssText;
+  bar.style.flexWrap="nowrap";bar.style.justifyContent="flex-start";
+  kids.forEach(function(k){k.style.flex="none";});
+  var cs=getComputedStyle(bar);
+  var gap=parseFloat(cs.columnGap)||0;
+  var chrome=parseFloat(cs.borderLeftWidth)+parseFloat(cs.borderRightWidth)+parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight);
+  var need=gap*(kids.length-1)+chrome;
+  kids.forEach(function(k){need+=k.getBoundingClientRect().width;});
+  kids.forEach(function(k){k.style.flex="";});
+  bar.style.cssText=keep;
+  var compact=need+24>bar.getBoundingClientRect().width;
+  bar.classList.toggle("tb-compact",compact);
+  if(compact!==was&&typeof resize==="function")resize();
+}
 window.addEventListener("resize",resize);
+window.addEventListener("resize",fitHeader);window.addEventListener("orientationchange",fitHeader);window.addEventListener("load",fitHeader);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitHeader);
 window.addEventListener("load",function(){resize();setTab("towns");setupFilters();renderTowns();renderStats();document.getElementById("iTotal").textContent=pts.length;hideSidebar();if(IS_TOUCH){document.getElementById("hint").textContent="Pinch = Zoom  |  Drag = Pan  |  Tap a pin = Details";}if(window.location.hash==="#hidden"){hideAllPins();}draw();loadImg();});
 
 </script>
