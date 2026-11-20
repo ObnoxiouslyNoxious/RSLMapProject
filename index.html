@@ -5,67 +5,93 @@
 <meta name="viewport" content="width=980">
 <title>Random Spawn Locations Map</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:monospace;background:#1a1a1a;color:#e0e0e0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-#topbar{background:#111;border-bottom:1px solid #333;padding:4px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
-#topbar h1{font-size:12px;color:#aaa;font-weight:bold;white-space:nowrap}
-.tb-group{display:flex;align-items:center;gap:5px}
-.tb-label{font-size:10px;color:#555}
-select,button,input[type=text]{background:#222;border:1px solid #444;color:#ddd;padding:3px 6px;font-size:11px;font-family:monospace;cursor:pointer;border-radius:2px}
-select:hover,button:hover{border-color:#777}
-button.on{background:#1a3a1a;border-color:#3a7a3a;color:#7afa7a}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/BarlowCondensed-400.woff2") format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:500;font-display:swap;src:url("fonts/BarlowCondensed-500.woff2") format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/BarlowCondensed-600.woff2") format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/BarlowCondensed-700.woff2") format("woff2")}
+:root{--bg:#0d0d0d;--text:#e0e0e0;--muted:#9aa0a8;--dim:#6c727a;--line:#2b2f36;--field:#101215;--accent:#7fd17a;--blue:#7ac8fa;--amber:#bf9c00}
+*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#3a3d42 #0d0d0d}
+body{font-family:"Barlow Condensed","Arial Narrow",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:500;font-size:14px;letter-spacing:.02em;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+a{color:#9fb4ff}
+#topbar,#bottombar,#infobar{border:7px solid transparent;border-image:url("img/InkRoll.png") 55 fill/7px stretch;background:none;flex-shrink:0}
+#topbar{padding:1px 8px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+#topbar h1{font-size:21px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);white-space:nowrap}
+.tb-group{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.tb-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tb-sep{width:1px;height:20px;background:var(--line);margin:0;flex-shrink:0}
+@media (max-width:1552px){#topbar .tb-search{margin-left:auto}#topbar .tb-sep-search{display:none}}
+button,.flt-btn{font:600 13px/1 "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--text);background:none;border:5px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/5px stretch;border-radius:0;padding:2px 6px;cursor:pointer}
+button:hover,.flt-btn:hover{filter:brightness(1.4)}
+button:disabled{opacity:.45;cursor:default}
+button.on,.b-add,.asp-btn-add{border-image-source:url("img/InkRollInnerGreen.png");color:#f0f7f0}
+.b-edit,.flt-btn.active,.cpy-btn{border-image-source:url("img/InkRollInnerBlue.png");color:#e8f4fb}
+.b-pub{border-image-source:url("img/InkRollInnerPurple.png");color:#f7e9f9}
+.b-amber{color:#e0b800}
+select,input[type=text],input[type=number],textarea{font:500 13px "Barlow Condensed","Arial Narrow",sans-serif;text-transform:none;letter-spacing:.02em;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:3px;padding:3px 6px;cursor:pointer}
+input[type=text],input[type=number],textarea{cursor:text}
+select:hover,input[type=text]:hover,input[type=number]:hover,textarea:hover{border-color:#555}
+select:focus,input[type=text]:focus,input[type=number]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+option{background:#16181c;color:var(--text)}
+::placeholder{color:#5b616a}
 #main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:300px;background:#111;border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
-#sidebar-toggle{position:absolute;left:300px;top:50%;transform:translateY(-50%);width:20px;height:48px;background:#1a1a1a;border:1px solid #444;border-left:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;border-radius:0 4px 4px 0;margin-left:-1px}
-#sidebar-toggle:hover{background:#222;border-color:#777}
-#sidebar-toggle img{width:14px;height:14px;image-rendering:pixelated;filter:brightness(0) invert(75%) sepia(100%) saturate(2000%) hue-rotate(10deg) brightness(90%)}
+#sidebar{width:340px;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
+#sidebar-toggle{position:absolute;left:340px;top:50%;transform:translateY(-50%);width:24px;height:54px;border:5px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/5px stretch;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;margin-left:-1px}
+#sidebar-toggle:hover{filter:brightness(1.4)}
+#sidebar-toggle img{width:16px;height:16px;filter:brightness(0) invert(75%) sepia(100%) saturate(2000%) hue-rotate(10deg) brightness(90%)}
 #sidebar.hidden{width:0;min-width:0;border:none;overflow:hidden;padding:0}
 #sidebar.hidden #stabs,#sidebar.hidden #scontent,#sidebar.hidden #sidebar-footer{display:none}
 #sidebar.hidden~#sidebar-toggle{left:0}
-#stabs{display:flex;border-bottom:1px solid #333}
-.stab{flex:1;padding:5px;text-align:center;font-size:10px;cursor:pointer;color:#555;border-bottom:2px solid transparent}
-.stab.on{color:#aaa;border-bottom-color:#4a8aaa}
-#scontent{flex:1;overflow-y:auto;padding:6px}
+#stabs{display:flex;border-bottom:1px solid var(--line)}
+.stab{flex:1;padding:6px 4px;text-align:center;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent}
+.stab:hover{color:var(--text)}
+.stab.on{color:var(--text);border-bottom-color:var(--accent)}
+#scontent{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px}
 #mapwrap{flex:1;position:relative;overflow:hidden;background:#1a1f1a;cursor:crosshair}
 canvas{position:absolute;top:0;left:0}
-#tip{position:fixed;background:#0d0d0d;border:1px solid #444;padding:7px 9px;font-size:11px;pointer-events:none;display:none;z-index:100;max-width:240px;line-height:1.7;border-radius:3px}
-.tid{color:#5aafea;font-weight:bold;font-size:12px}
-.ttags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-.tag{padding:1px 5px;border-radius:2px;font-size:10px}
-.tr{background:#1a3a1a;color:#6afa6a;border:1px solid #3a6a3a}
-.tn{background:#3a2a1a;color:#faaa6a;border:1px solid #6a4a2a}
-.th{background:#3a1a3a;color:#ea6aea;border:1px solid #6a3a6a}
-.tb{background:#2a3a1a;color:#aafa6a;border:1px solid #5a7a3a}
-#infobar{background:#111;border-top:1px solid #333;padding:4px 10px;font-size:10px;color:#ffffff;display:flex;gap:14px;flex-shrink:0;align-items:center}
-.iv span{color:#bf9c00}
-.town-row{display:flex;align-items:center;padding:3px 2px;border-bottom:1px solid #1e1e1e;font-size:11px;cursor:pointer}
-.town-row:hover{background:#181818}
-.town-row.sel{background:#1a2a1a}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:5px}
+#tip{position:fixed;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;padding:0 3px;font-size:13px;pointer-events:none;display:none;z-index:100;max-width:260px;line-height:1.55}
+.tid{color:#5aafea;font-weight:700;font-size:15px}
+.ttags{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
+.tag{padding:0 3px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#e8e8e8;background:none;border:4px solid transparent;border-image:url("img/InkRollInnerCharcoal.png") 25 fill/4px stretch;border-radius:0}
+.tr{border-image-source:url("img/InkRollInnerGreen.png");color:#e8f7e8}
+.tn{border-image-source:url("img/InkRollInnerBrown.png");color:#fbe7d4}
+.th{border-image-source:url("img/InkRollInnerPurple.png");color:#f7e9f9}
+.tb{border-image-source:url("img/InkRollInnerOlive.png");color:#f3f9dc}
+.tag-iso{border-image-source:url("img/InkRollInnerGold.png");color:#ffe9a6}
+.tag-wild{border-image-source:url("img/InkRollInnerTeal.png");color:#c9f7e3}
+#infobar{padding:0 8px;font-size:13px;color:#ffffff;display:flex;gap:16px;align-items:center}
+.iv{text-transform:uppercase;letter-spacing:.05em}
+.iv span{color:#d4a900}
+.town-row{display:flex;align-items:center;padding:3px 4px;border-bottom:1px solid #1b1d21;font-size:14px;cursor:pointer}
+.town-row:hover{background:rgba(255,255,255,.05)}
+.town-row.sel{background:rgba(127,209,122,.14)}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:6px}
 .tname{flex:1}
-.tcnt{color:#bebebe;font-size:10px}
-.ptitle{font-size:10px;color:#555;padding:3px 0 6px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #222;margin-bottom:4px}
-.erow{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #181818}
-.erow label{color:#777;font-size:10px}
-.erow select,.erow input{width:120px;font-size:10px}
-.cpy-btn{width:100%;margin-top:4px;padding:5px;font-size:10px;background:#1a2a3a;border:1px solid #3a5a7a;color:#7aaafa;border-radius:2px;cursor:pointer;text-align:left;display:block}
-.cpy-btn:hover{background:#253a4a}
+.tcnt{color:#bebebe;font-size:12px}
+.ptitle{font-size:12px;color:var(--muted);padding:3px 0 6px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line);margin-bottom:4px}
+.erow{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1b1d21}
+.erow label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.erow select,.erow input{width:120px;font-size:13px}
+.cpy-btn{width:100%;margin-top:4px;padding:3px 8px;text-align:left;display:block}
 #zbtn{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;gap:3px;z-index:10}
-#zbtn button{width:26px;height:26px;font-size:14px;padding:0;text-align:center}
-#copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:12px;display:none;z-index:200;pointer-events:none}
-
+#zbtn button{width:32px;height:32px;font-size:17px;padding:0;text-align:center}
+#copyflash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a1a;border:1px solid #3a7a3a;color:#7afa7a;padding:6px 16px;border-radius:4px;font-size:15px;font-weight:600;letter-spacing:.04em;display:none;z-index:200;pointer-events:none}
 .flt-wrap{position:relative;display:inline-block}
-.flt-btn{background:#222;border:1px solid #444;color:#ddd;padding:3px 20px 3px 6px;font-size:11px;font-family:monospace;cursor:pointer;border-radius:2px;white-space:nowrap}
-.flt-btn:hover{border-color:#777}
-.flt-btn.active{border-color:#4a8aaa;color:#7adafa}
-.flt-panel{display:none;position:absolute;top:100%;left:0;z-index:500;background:#1a1a1a;border:1px solid #444;border-radius:2px;min-width:160px;max-height:260px;overflow-y:auto;margin-top:2px;box-shadow:0 4px 12px rgba(0,0,0,0.6)}
+.flt-btn{padding:2px 18px 2px 6px;white-space:nowrap}
+.flt-panel{display:none;position:absolute;top:100%;left:0;z-index:500;border:8px solid transparent;border-image:url("img/InkRoll.png") 55 fill/8px stretch;background:none;min-width:190px;max-height:300px;overflow-y:auto;margin-top:2px}
 .flt-panel.open{display:block}
-.flt-action{padding:4px 8px;font-size:10px;color:#7aaafa;cursor:pointer;border-bottom:1px solid #222;display:block;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:monospace}
-.flt-action:hover{background:#1a2a3a}
-.flt-item{display:flex;align-items:center;padding:3px 8px;cursor:pointer;font-size:11px;font-family:monospace;color:#ccc;gap:6px}
-.flt-item:hover{background:#222}
-.flt-item input[type=checkbox]{accent-color:#4a8aaa;cursor:pointer;flex-shrink:0}
-
+.flt-action{display:block;width:100%;text-align:left;padding:3px 6px;font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none;border-image:none;border-bottom:1px solid #22262b;border-radius:0}
+.flt-action:hover{background:rgba(122,200,250,.1);filter:none}
+.flt-item{display:flex;align-items:center;padding:3px 6px;cursor:pointer;font-size:14px;color:#ccc;gap:6px}
+.flt-item:hover{background:rgba(255,255,255,.06)}
+.flt-item input[type=checkbox]{accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.cpy-btn{text-transform:none;letter-spacing:.02em}
+.b-del{display:block;width:100%;margin-bottom:6px;border-image-source:url("img/InkRollInnerRed.png");color:#fbe9e9}
+.pz-link{display:block;color:#7aaafa;font-size:13px;margin-bottom:4px;text-decoration:none}
+.pz-link:hover{text-decoration:underline}
+.coord-note{margin-top:6px;color:var(--dim);font-size:12px}
+.top-logo{display:inline-flex;line-height:0;flex-shrink:0;margin-left:4px}
+.top-logo img{width:34px;height:34px;filter:brightness(.65);transition:filter .15s}
+.top-logo:hover img{filter:brightness(1)}
 @supports(height:100dvh){body{height:100dvh}}
 canvas{touch-action:none}
 @media (pointer:coarse){
@@ -76,7 +102,7 @@ canvas{touch-action:none}
 <body>
 <div id="topbar">
   <h1>Random Spawn Locations Map</h1>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-sep"></div>
   <div class="tb-group">
     <select id="mapSelect" onchange="loadImg()">
       <option value="knoxvector">World Vector</option>
@@ -84,16 +110,16 @@ canvas{touch-action:none}
       <option value="indianamap.jpg">Indiana Paper</option>
     </select>
   </div>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-sep"></div>
   <div class="tb-group">
-    <button onclick="hideAllPins()" style="color:#bf9c00">Hide Pins</button>
-    <button onclick="showAllPins()" style="color:#bf9c00">Show Pins</button>
+    <button onclick="hideAllPins()" class="b-amber">Hide Pins</button>
+    <button onclick="showAllPins()" class="b-amber">Show Pins</button>
   </div>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-sep"></div>
   <div class="tb-group">
     <button id="bBal" onclick="toggleMode('balance')">Balanced</button>
   </div>
-  <div style="width:1px;height:18px;background:#111;margin:0 14px;flex-shrink:0"></div>
+  <div class="tb-sep"></div>
   <div class="tb-group">
     <span class="tb-label">Locations:</span>
     <div class="flt-wrap" id="wrap-town">
@@ -120,12 +146,13 @@ canvas{touch-action:none}
       </div>
     </div>
   </div>
-  <div style="flex:1"></div>
-  <div class="tb-group">
+  <div class="tb-sep tb-sep-search"></div>
+  <div class="tb-group tb-search">
+    <span id="searchResult" style="font-size:13px;color:#fa7a7a"></span>
     <span class="tb-label">Search ID:</span>
     <input type="text" id="searchId" placeholder="e.g. 653" style="width:55px" onkeydown="if(event.key==='Enter')searchById()">
     <button onclick="searchById()">Go</button>
-    <span id="searchResult" style="font-size:10px;color:#fa7a7a;min-width:60px"></span>
+    <a class="top-logo" href="https://obnox.dev/" target="_blank" rel="noopener"><img src="img/obnox-fly-footer.webp" width="34" height="34" alt="ObnoxiouslyNoxious" title="ObnoxiouslyNoxious"></a>
   </div>
   </div>
 
@@ -139,7 +166,6 @@ canvas{touch-action:none}
       <div id="p-towns"></div>
       <div id="p-stats" style="display:none"></div>
     </div>
-  <div style="padding:8px 0;text-align:center;flex-shrink:0;border-top:1px solid #222"><a href="https://obnoxiouslynoxious.github.io/" target="_blank" style="display:inline-block"><img src="img/obnox.png" style="width:28px;height:28px;border-radius:50%;border:1px solid #444;display:block;image-rendering:pixelated" title="ObnoxiouslyNoxious"></a></div>
   </div>
   <div id="sidebar-toggle" onclick="toggleSidebar()"><img src="img/arrow_left.png" id="sidebar-toggle-img"></div>
   <div id="mapwrap">
@@ -279,7 +305,7 @@ function copyAbs(){if(_selPt){flashCopy(_selPt.ax+"x"+_selPt.ay);}}
 
 function copyLua(){if(_selPt){var p=_selPt,pz=p.pz?", posZ="+p.pz:"";flashCopy("{ worldX="+p.wx+", worldY="+p.wy+", posX="+p.px+", posY="+p.py+pz+" }");}}
 dotC.addEventListener("mousedown",function(e){drag=true;dsx=e.offsetX;dsy=e.offsetY;dvx=vx;dvy=vy;dotC.style.cursor="grabbing";});
-function showTipAt(sx,sy,cx,cy,r){var p=nearest(sx,sy,r);var tip=document.getElementById("tip");if(p){tip.style.display="block";tip.style.left=(cx+14)+"px";tip.style.top=(cy-8)+"px";var tags="<span class=\"tag "+(p.xi===0?"tr":"tn")+"\">"+TYPES[p.xi]+"</span>";if(p.hc)tags+="<span class=\"tag th\">Hardcore</span>";if(p.bal)tags+="<span class=\"tag tb\">Balance</span>";if(p.ti===8)tags+="<span class=\"tag\" style=\"background:#4a3a00;color:#ffdd44\">Isolated</span>";if(p.ti===22)tags+="<span class=\"tag\" style=\"background:#003a1a;color:#44ffaa\">Wilderness</span>";tip.innerHTML="<div class=\"tid\">ID:"+p.id+"</div><div style=\"color:#bbb\">"+(p.note||"(no note)")+"</div><div style=\"color:#666;font-size:10px\">"+TOWNS[p.ti]+" - "+CATS[p.ci]+"</div><div style=\"color:#888;font-size:10px\">abs: "+p.ax+", "+p.ay+"</div><div style=\"color:#555;font-size:10px\">wx:"+p.wx+" wy:"+p.wy+" px:"+p.px+" py:"+p.py+(p.pz?" z:"+p.pz:"")+"</div><div class=\"ttags\">"+tags+"</div>";tip.style.left=Math.max(4,Math.min(cx+14,window.innerWidth-tip.offsetWidth-4))+"px";tip.style.top=Math.max(4,Math.min(cy-8,window.innerHeight-tip.offsetHeight-4))+"px";}else{tip.style.display="none";}}
+function showTipAt(sx,sy,cx,cy,r){var p=nearest(sx,sy,r);var tip=document.getElementById("tip");if(p){tip.style.display="block";tip.style.left=(cx+14)+"px";tip.style.top=(cy-8)+"px";var tags="<span class=\"tag "+(p.xi===0?"tr":"tn")+"\">"+TYPES[p.xi]+"</span>";if(p.hc)tags+="<span class=\"tag th\">Hardcore</span>";if(p.bal)tags+="<span class=\"tag tb\">Balance</span>";if(p.ti===8)tags+="<span class=\"tag tag-iso\">Isolated</span>";if(p.ti===22)tags+="<span class=\"tag tag-wild\">Wilderness</span>";tip.innerHTML="<div class=\"tid\">ID:"+p.id+"</div><div style=\"color:#bbb\">"+(p.note||"(no note)")+"</div><div style=\"color:#8a9099;font-size:13px\">"+TOWNS[p.ti]+" - "+CATS[p.ci]+"</div><div style=\"color:#a4aab2;font-size:13px\">abs: "+p.ax+", "+p.ay+"</div><div style=\"color:#7c828a;font-size:12px\">wx:"+p.wx+" wy:"+p.wy+" px:"+p.px+" py:"+p.py+(p.pz?" z:"+p.pz:"")+"</div><div class=\"ttags\">"+tags+"</div>";tip.style.left=Math.max(4,Math.min(cx+14,window.innerWidth-tip.offsetWidth-4))+"px";tip.style.top=Math.max(4,Math.min(cy-8,window.innerHeight-tip.offsetHeight-4))+"px";}else{tip.style.display="none";}}
 dotC.addEventListener("mousemove",function(e){if(drag){vx=dvx+(e.offsetX-dsx);vy=dvy+(e.offsetY-dsy);draw();return;}showTipAt(e.offsetX,e.offsetY,e.clientX,e.clientY,16);});
 dotC.addEventListener("mouseup",function(e){var was=drag;drag=false;dotC.style.cursor="crosshair";if(was)draw();});
 dotC.addEventListener("mouseleave",function(){var was=drag;drag=false;document.getElementById("tip").style.display="none";if(was)draw();});
@@ -338,7 +364,7 @@ function setMF(t){
   syncCheckboxes("mapmod",fMapMod);updateFilterBtn("mapmod");draw();
 }
 function mkOpt(val,label,sel){return "<option value=\""+val+"\""+(sel?" selected":"")+">"+label+"</option>";}
-function renderStats(){var MAP_MOD_INDICES=[16,17,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42];var byTown={};var SPAWN_TYPE_KEYS=["Hardcore","Isolated Areas","Wilderness"];SPAWN_TYPE_KEYS.forEach(function(t){byTown[t]={tot:0,bal:0,hc:0,res:0,nonres:0,isMod:false};});pts.forEach(function(p){var t=modTown(TOWNS[p.ti]);if(!byTown[t])byTown[t]={tot:0,bal:0,hc:0,res:0,nonres:0,isMod:MAP_MOD_INDICES.indexOf(p.ti)!==-1};byTown[t].tot++;if(p.bal)byTown[t].bal++;if(p.hc)byTown[t].hc++;if(p.xi===0)byTown[t].res++;else if(p.xi===1)byTown[t].nonres++;if(p.hc){byTown["Hardcore"].tot++;if(p.bal)byTown["Hardcore"].bal++;byTown["Hardcore"].hc++;if(p.xi===0)byTown["Hardcore"].res++;else if(p.xi===1)byTown["Hardcore"].nonres++;}});var GRID="display:grid;grid-template-columns:100px 34px 34px 28px 34px 50px;gap:1px 0";var numStyle="text-align:right;padding-right:4px;white-space:nowrap";var hdr="<div style=\""+GRID+";color:#444;padding:2px 0;border-bottom:1px solid #222\"><span style=\"white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">TOWN</span><span style=\""+numStyle+"\">TOT</span><span style=\""+numStyle+"\">BAL</span><span style=\""+numStyle+"\">HC</span><span style=\""+numStyle+"\">RES</span><span style=\""+numStyle+"\">NONRES</span></div>";function rowHtml(t){var s=byTown[t];return "<div style=\""+GRID+";padding:2px 0;border-bottom:1px solid #1a1a1a\"><span style=\"color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px\" title=\""+t+"\">"+t+"</span><span style=\"color:#777;"+numStyle+"\">"+s.tot+"</span><span style=\"color:#6afa6a;"+numStyle+"\">"+s.bal+"</span><span style=\"color:#fa6afa;"+numStyle+"\">"+s.hc+"</span><span style=\"color:#6aaafa;"+numStyle+"\">"+s.res+"</span><span style=\"color:#fa9a3a;"+numStyle+"\">"+s.nonres+"</span></div>";}var vanillaTowns=Object.keys(byTown).filter(function(t){return !byTown[t].isMod&&SPAWN_TYPE_KEYS.indexOf(t)===-1;}).sort(function(a,b){return byTown[b].tot-byTown[a].tot;});var moddedTowns=Object.keys(byTown).filter(function(t){return byTown[t].isMod&&SPAWN_TYPE_KEYS.indexOf(t)===-1;}).sort(function(a,b){return byTown[b].tot-byTown[a].tot;});var h="<div class=\"ptitle\">Stats</div><div style=\"font-size:10px\">"+hdr;vanillaTowns.forEach(function(t){h+=rowHtml(t);});if(moddedTowns.length>0){h+="<div class=\"ptitle\" style=\"margin-top:10px\">Modded Maps</div>"+hdr;moddedTowns.forEach(function(t){h+=rowHtml(t);});}h+="<div class=\"ptitle\" style=\"margin-top:10px\">Spawn Types</div>"+hdr;SPAWN_TYPE_KEYS.forEach(function(t){h+=rowHtml(t);});document.getElementById("p-stats").innerHTML=h+"</div>";}
+function renderStats(){var MAP_MOD_INDICES=[16,17,18,19,20,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42];var byTown={};var SPAWN_TYPE_KEYS=["Hardcore","Isolated Areas","Wilderness"];SPAWN_TYPE_KEYS.forEach(function(t){byTown[t]={tot:0,bal:0,hc:0,res:0,nonres:0,isMod:false};});pts.forEach(function(p){var t=modTown(TOWNS[p.ti]);if(!byTown[t])byTown[t]={tot:0,bal:0,hc:0,res:0,nonres:0,isMod:MAP_MOD_INDICES.indexOf(p.ti)!==-1};byTown[t].tot++;if(p.bal)byTown[t].bal++;if(p.hc)byTown[t].hc++;if(p.xi===0)byTown[t].res++;else if(p.xi===1)byTown[t].nonres++;if(p.hc){byTown["Hardcore"].tot++;if(p.bal)byTown["Hardcore"].bal++;byTown["Hardcore"].hc++;if(p.xi===0)byTown["Hardcore"].res++;else if(p.xi===1)byTown["Hardcore"].nonres++;}});var GRID="display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 34px 38px 52px;gap:1px 0";var numStyle="text-align:center;white-space:nowrap";var hdr="<div style=\""+GRID+";color:#8a9099;padding:2px 0;border-bottom:1px solid #2b2f36\"><span style=\"white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">TOWN</span><span style=\""+numStyle+"\">TOT</span><span style=\""+numStyle+"\">BAL</span><span style=\""+numStyle+"\">HC</span><span style=\""+numStyle+"\">RES</span><span style=\""+numStyle+"\">NONRES</span></div>";function rowHtml(t){var s=byTown[t];return "<div style=\""+GRID+";padding:2px 0;border-bottom:1px solid #1a1a1a\"><span style=\"color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px\" title=\""+t+"\">"+t+"</span><span style=\"color:#777;"+numStyle+"\">"+s.tot+"</span><span style=\"color:#6afa6a;"+numStyle+"\">"+s.bal+"</span><span style=\"color:#fa6afa;"+numStyle+"\">"+s.hc+"</span><span style=\"color:#6aaafa;"+numStyle+"\">"+s.res+"</span><span style=\"color:#fa9a3a;"+numStyle+"\">"+s.nonres+"</span></div>";}var vanillaTowns=Object.keys(byTown).filter(function(t){return !byTown[t].isMod&&SPAWN_TYPE_KEYS.indexOf(t)===-1;}).sort(function(a,b){return byTown[b].tot-byTown[a].tot;});var moddedTowns=Object.keys(byTown).filter(function(t){return byTown[t].isMod&&SPAWN_TYPE_KEYS.indexOf(t)===-1;}).sort(function(a,b){return byTown[b].tot-byTown[a].tot;});var h="<div class=\"ptitle\">Stats</div><div style=\"font-size:13px\">"+hdr;vanillaTowns.forEach(function(t){h+=rowHtml(t);});if(moddedTowns.length>0){h+="<div class=\"ptitle\" style=\"margin-top:10px\">Modded Maps</div>"+hdr;moddedTowns.forEach(function(t){h+=rowHtml(t);});}h+="<div class=\"ptitle\" style=\"margin-top:10px\">Spawn Types</div>"+hdr;SPAWN_TYPE_KEYS.forEach(function(t){h+=rowHtml(t);});document.getElementById("p-stats").innerHTML=h+"</div>";}
 function saveState(){var s=pts.map(function(p){return{id:p.id,bal:p.bal,hc:p.hc,wild:p.wild,mt:p.mt,ti:p.ti,xi:p.xi,ci:p.ci,note:p.note};});dl("rsl_state.json",JSON.stringify(s));}
 function loadState(){var inp=document.createElement("input");inp.type="file";inp.accept=".json";inp.onchange=function(e){var r=new FileReader();r.onload=function(ev){try{var s=JSON.parse(ev.target.result);var m={};s.forEach(function(x){m[x.id]=x;});pts.forEach(function(p){if(m[p.id]){var x=m[p.id];p.bal=!!x.bal;p.hc=!!x.hc;p.wild=!!x.wild;p.mt=!!x.mt;if(x.ti!==undefined)p.ti=x.ti;if(x.xi!==undefined)p.xi=x.xi;if(x.ci!==undefined)p.ci=x.ci;if(x.note)p.note=x.note;}});draw();alert("Loaded: "+s.filter(function(x){return x.bal;}).length+" balanced");}catch(err){alert("Error: "+err);}};r.readAsText(e.target.files[0]);};inp.click();}
 function exportIds(){var byTown={};pts.filter(function(p){return p.bal;}).forEach(function(p){var t=modTown(TOWNS[p.ti]);if(!byTown[t])byTown[t]=[];byTown[t].push(p.id);});var txt="-- Balance=true IDs by town\n";Object.keys(byTown).forEach(function(t){txt+="-- "+t+" ("+byTown[t].length+"): "+byTown[t].join(", ")+"\n";});dl("balance_ids.txt",txt);}
